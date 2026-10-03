@@ -175,7 +175,7 @@ def ask_ollama(text):
         headers={"Content-Type": "application/json"},
     )
     try:
-        with urllib.request.urlopen(req, timeout=12) as resp:
+        with urllib.request.urlopen(req, timeout=45) as resp:
             data = json.loads(resp.read().decode())
         reply = (data.get("response") or "").strip()
         match = re.search(r"\{.*\}", reply, re.DOTALL)
@@ -370,7 +370,11 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(data)
 
     def do_GET(self):
-        self._send(render_html(None))
+        parsed = urllib.parse.urlsplit(self.path)
+        params = urllib.parse.parse_qs(parsed.query)
+        q = (params.get("q") or [""])[0][:2000]
+        result = analyze(q) if q.strip() else None
+        self._send(render_html(result))
 
     def do_POST(self):
         length = int(self.headers.get("Content-Length", 0))

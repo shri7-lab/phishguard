@@ -2,6 +2,8 @@
 
 **Local-first phishing & scam link checker — built for a friend, in a Hacktoberfest weekend.**
 
+![PhishGuard terminal verdict](assets/terminal.png)
+
 > Paste a suspicious WhatsApp forward, a "your account will be suspended" SMS link, or a
 > shady Discord DM into your terminal. PhishGuard scores it, explains *why* it's suspicious,
 > and **your data never leaves your machine**.
@@ -52,6 +54,9 @@ python3 phishguard.py check --json --no-ai "http://192.168.0.1/bank-login"
 
 # browser demo
 python3 phishguard.py web            # → http://localhost:8080
+
+# shareable one-shot link (handy for WhatsApp-ing a verdict to a friend)
+# http://localhost:8080/?q=<your-url-or-message>
 ```
 
 ## 🤖 Optional: add local AI
@@ -101,6 +106,8 @@ If Ollama isn't running, PhishGuard degrades gracefully to heuristic-only mode a
 ```bash
 python3 phishguard.py web --port 8080
 ```
+
+![PhishGuard web demo](assets/web-result.png)
 
 Deploy it on [Render](https://render.com) free tier: start command
 `python3 phishguard.py web`, health check `/`. (The hosted demo runs the heuristic engine;

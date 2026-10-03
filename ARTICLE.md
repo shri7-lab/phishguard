@@ -24,7 +24,7 @@ So the friend request became a weekend project:
 
 **PhishGuard — a phishing checker that never phones home.**
 
-[SCREENSHOT: terminal verdict PHISHING 🔴]
+![PhishGuard CLI — phishing verdict with score breakdown](https://raw.githubusercontent.com/shri7-lab/phishguard/main/assets/terminal.png)
 
 ## What it actually does
 
@@ -92,7 +92,7 @@ There's also a browser mode for people who won't open a terminal:
 python3 phishguard.py web   # dark-themed UI on localhost:8080
 ```
 
-[SCREENSHOT/GIF: paste link → verdict card]
+![PhishGuard browser demo — paste link, get an explained verdict](https://raw.githubusercontent.com/shri7-lab/phishguard/main/assets/web-result.png)
 
 ## The build, honestly
 
@@ -126,9 +126,9 @@ If PhishGuard saves one friend from a "fee refund" scam, it beat every star coun
 ### 📝 Publishing checklist (edit before submitting on DEV)
 
 - [ ] Replace "My friend" details if you want the real first name
-- [ ] Insert 1–2 real screenshots (run the tool, crop the terminal)
+- [x] Screenshots inserted (terminal + web demo, auto-hosted from repo)
 - [ ] Optional GIF: record paste → verdict (free tools: **Kap** on Mac, **ScreenToGif** on Windows, `asciinema` + `agg` on Linux)
-- [ ] Cover image: dark terminal shot with 🔴 PHISHING verdict
+- [ ] Cover image: use `assets/terminal.png`
 - [ ] On DEV: paste article, add tags `hf26challenge` `devchallenge` `weekendchallenge` (+ `security`, `ai`, `opensource`)
 - [ ] Link the repo in the first 3 lines
 - [ ] Submit at the challenge page before the deadline
