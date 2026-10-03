@@ -11,7 +11,7 @@
 ```
 $ python3 phishguard.py check "verify ur account here bit.ly/free-jio-recharge before it expires"
 
-PhishGuard v1.0.0
+PhishGuard v1.1.0
 ----------------------------------------------
 Input   : verify ur account here bit.ly/free-jio-recharge before it expires
 Verdict : 🟠 SUSPICIOUS  (score 41/100)
@@ -31,6 +31,10 @@ Verdict : 🟠 SUSPICIOUS  (score 41/100)
   (via [Ollama](https://ollama.com)) for the fuzzy "is this message a scam?" cases.
 - **Explainable** — every point is itemized (+35p raw IP, +20p risky TLD, …) instead of a
   black-box score.
+- **Advanced offline detection** — brand-spoof & homoglyph domains (`g00gle-login.com`,
+  Cyrillic look-alikes), **hidden URLs inside base64/hex blobs**, and **display-name email
+  spoofing** (`PayPal Security <secure@paypa1-support.xyz>`) — all without a single network call.
+- **Tested** — 11 unit tests, stdlib `unittest` only (see below).
 - **Privacy by design** — cloud checkers want you to paste the suspicious link into someone
   else's server. PhishGuard runs 100% on your laptop.
 - **Browser demo included** — one command gives you a dark-themed web UI you can share with
@@ -92,6 +96,10 @@ If Ollama isn't running, PhishGuard degrades gracefully to heuristic-only mode a
 | Raw IPv4 address instead of a domain | +35 |
 | `@` embedded in URL (host-spoof trick) | +25 |
 | Punycode / IDN (`xn--`) homograph host | +25 |
+| Unicode look-alike characters in domain | +25 |
+| Brand spoof (`paypal-secure.tk`, `g00gle-login.com`) | +25 |
+| Display name says "PayPal", sender isn't | +25 |
+| Hidden URL inside a base64/hex blob | +30 |
 | High-risk TLD (`.zip` `.tk` `.xyz` `.top` …) | +20 |
 | Link shortener (bit.ly, rb.gy, …) | +15 |
 | Deep subdomains / long URL / extra port | +8…+15 |
@@ -100,6 +108,14 @@ If Ollama isn't running, PhishGuard degrades gracefully to heuristic-only mode a
 | Trusted brand domain (github.com, google.com …) | −25 |
 
 **SAFE** < 30 · **SUSPICIOUS** 30–59 · **PHISHING** ≥ 60
+
+## 🧪 Tests
+
+11 tests, pure standard library — no pytest, no mocks, no network:
+
+```bash
+python3 -m unittest discover -s tests -v
+```
 
 ## 🌐 Free live demo
 
@@ -121,6 +137,8 @@ the full AI mode runs on your own machine — that's the point.)
 ```
 phishguard/
 ├── phishguard.py   # the whole tool (CLI + web server), stdlib only
+├── tests/          # 11 unittest cases — scoring, spoofing, hidden URLs
+├── render.yaml     # one-click Render blueprint
 ├── ARTICLE.md      # DEV.to write-up draft
 ├── LICENSE         # MIT
 └── README.md

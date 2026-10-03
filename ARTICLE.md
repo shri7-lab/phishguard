@@ -49,6 +49,21 @@ Verdict : 🔴 PHISHING  (score 75/100)
 
 No mystery score. Every point has a reason your friend can *understand*.
 
+And because phishing in 2026 doesn't stop at shady URLs, the scanner also catches the
+sneaky ones — all **offline, zero network calls**:
+
+- **Brand spoofing:** `paypal-secure.tk`, `g00gle-login.com` → flagged for using a brand
+  they don't own (with digit + Cyrillic look-alike normalization, `g00gle` → `google`)
+- **Hidden URLs:** base64/hex blobs in a message that decode to `http://evil...`
+- **Email spoofing:** `PayPal Security <secure@paypa1-support.xyz>` → display name and
+  sender domain disagree
+
+```
+  message:
+    +30p  hidden URL inside an encoded blob → http://evil.test/login
+    +25p  display name says 'PayPal Security' but sender is paypa1-support.xyz
+```
+
 ## The architecture: rules + open-source AI
 
 Pure blocklists miss novel scams. Pure LLMs hallucinate and need your data to leave the
@@ -122,6 +137,11 @@ python3 phishguard.py web   # dark-themed UI on localhost:8080
 What surprised me: **most phishing detection advice online is "look for the lock icon and check
 the spelling."** My friends don't do that at 11 PM. They need a *second pair of eyes that
 answers in 2 seconds* — not a lecture.
+
+Everything above runs on **11 stdlib `unittest` tests** (`python3 -m unittest discover -s tests`)
+— scoring thresholds, homoglyph spoofs, hidden blobs, email fakes. When I changed a score
+value at 1 AM, the suite caught the regression before I did. For a "one file, no dependencies"
+tool, tests felt like the grown-up thing to have.
 
 ## What's next (steal these ideas if you want)
 
