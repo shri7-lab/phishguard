@@ -3,6 +3,12 @@
 > 🏷️ Tags: `hf26challenge` `devchallenge` `weekendchallenge` `security` `ai` `opensource` `python`
 > 📅 DEV Weekend Challenge: **Build for a Friend** · Hacktoberfest 2026
 > 🔗 Repo: https://github.com/shri7-lab/phishguard
+> 🌐 **Live demo:** https://phishguard.onrender.com
+
+## Prize Categories
+
+- **Best Use of Gemma** — `gemma3:2b` (Google's open-weight model) runs the local AI second-opinion via Ollama
+- **Best Use of Render** — the PhishGuard web demo is hosted on Render (link above)
 
 ---
 
@@ -75,6 +81,18 @@ def ask_ollama(text):
 
 If Ollama isn't running, PhishGuard says so and falls back to heuristics — it never
 pretends to be smarter than it is.
+
+## Why open innovation matters here
+
+This tool's whole promise is *"your data never leaves your machine."* That promise is only
+possible because the AI underneath is **open and local**: an open-weight model (Gemma) served
+by an open-source runtime (Ollama) inside a zero-dependency script. Swap the closed version of
+this — paste the suspicious link into a hosted "AI scam checker" — and you've just handed a
+stranger the exact thing you were suspicious about, plus your query history.
+
+Open also means **auditable**: anyone can read the 15 scoring rules, disagree with one, and
+send a PR. Try that with a proprietary fraud score. And it means my friend can run it on a
+laptop with the Wi-Fi off — which, for a security tool, is the point.
 
 ## Zero dependencies, on purpose
 

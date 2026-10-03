@@ -109,6 +109,9 @@ python3 phishguard.py web --port 8080
 
 ![PhishGuard web demo](assets/web-result.png)
 
+One-click host: the repo ships a [`render.yaml`](render.yaml) blueprint — on Render:
+**New → Blueprint → pick this repo → Deploy** (start command auto-set).
+
 Deploy it on [Render](https://render.com) free tier: start command
 `python3 phishguard.py web`, health check `/`. (The hosted demo runs the heuristic engine;
 the full AI mode runs on your own machine — that's the point.)
