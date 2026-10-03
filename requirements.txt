@@ -1,0 +1,2 @@
+# PhishGuard has ZERO runtime dependencies — Python 3.8+ standard library only.
+# Optional AI mode needs a local Ollama server: https://ollama.com
