@@ -320,17 +320,6 @@ def ask_ollama(text):
 def analyze(text):
     links = extract_links(text)
     msg_findings, msg_points = scan_message(text)
-    if not links and not msg_findings:
-        return {
-            "input": text,
-            "verdict": "SAFE",
-            "score": 0,
-            "links": [],
-            "message_findings": [],
-            "ai": None,
-            "ai_error": None,
-            "note": "no link found in input — heuristic scan only",
-        }
 
     worst_score = 0
     worst_verdict = "SAFE"
@@ -364,9 +353,17 @@ def analyze(text):
     if not os.environ.get("PHISHGUARD_NO_AI"):
         ai = ask_ollama(text)
         if ai is None:
-            ai_error = "Ollama unreachable — heuristic-only mode (start with: ollama serve)"
+            ai_error = "local AI unavailable (start 'ollama serve') or reply unparseable — heuristic-only mode"
         elif order[ai["verdict"]] > order[worst_verdict]:
             worst_verdict = ai["verdict"]
+
+    note = None
+    if not links and not msg_findings:
+        note = (
+            "no link/payload found — local AI weighed in on the text"
+            if ai
+            else "no link found in input — heuristic scan only"
+        )
 
     return {
         "input": text,
@@ -376,7 +373,7 @@ def analyze(text):
         "message_findings": [{"points": p, "detail": d} for p, d in msg_findings],
         "ai": ai,
         "ai_error": ai_error,
-        "note": None,
+        "note": note,
     }
 
 
