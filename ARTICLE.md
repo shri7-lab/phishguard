@@ -1,43 +1,33 @@
 # My friend almost got phished — so I built him a local AI bodyguard in one weekend
 
-> 🏷️ Tags: `hf26challenge` `devchallenge` `weekendchallenge` `security` `ai` `opensource` `python`
 > 📅 DEV Weekend Challenge: **Build for a Friend** · Hacktoberfest 2026
 > 🔗 Repo: https://github.com/shri7-lab/phishguard
-> 🌐 **Live demo:** https://phishguard-oi4y.onrender.com
+> 🌐 Live demo: https://phishguard-oi4y.onrender.com
 
 ## Prize Categories
 
-- **Best Use of Gemma** — `gemma3:2b` (Google's open-weight model) runs the local AI second-opinion via Ollama
-- **Best Use of Render** — the PhishGuard web demo is hosted on Render (link above)
+- **Best Use of Gemma** — `gemma3:2b` runs as the local AI second-opinion through Ollama
+- **Best Use of Render** — the web demo is hosted on Render (link above)
 
 ---
 
-**Friday night, 11:47 PM.** My friend's WhatsApp lights up:
+Friday night, 11:47 PM. A friend forwards this on WhatsApp:
 
-> ⚠️ *"Your IES College fee payment FAILED. Within 24 hrs your registration will be cancelled.
-> Re-verify now: `bit.ly/fee-refund-2026`"*
+> "URGENT: Your IES College fee payment FAILED. Registration will be cancelled in 24 hours. Re-verify now: `bit.ly/fee-refund-2026`"
 
-He was about to tap it. He's not "bad with tech" — he's just tired, it's late, and the message
-sounds *official*. That's exactly how phishing works. It doesn't hack your computer. **It hacks
-your 3 AM brain.**
+He was about to tap it. He's not careless with tech, he was just tired. And honestly that message would fool half our college group — it *looks* official.
 
-I asked him to send me the link first. I opened three different "is this safe?" websites… and
-then stopped. Wait — I'm pasting a **suspicious link into a random cloud service?** Now
-*someone else's server* has the link, my query, and a timestamp. Security people call this a
-bad habit. I call it Tuesday.
+I told him to send it to me first. Then I opened a couple of those "is this link safe?" websites... and stopped midway. Wait — I'm about to paste a *suspicious* link into some random cloud service? Now their server has the link, my query, everything. That's like a cop announcing his own address during a raid. Anyway.
 
-So the friend request became a weekend project:
+Closed those tabs, told him: give me the weekend.
 
-**PhishGuard — a phishing checker that never phones home.**
+**PhishGuard — a phishing checker that doesn't phone home.**
 
 ![PhishGuard CLI — phishing verdict with score breakdown](https://raw.githubusercontent.com/shri7-lab/phishguard/main/assets/terminal.png)
 
 ## What it actually does
 
-Paste any URL or full message (WhatsApp forward, SMS, Discord DM). PhishGuard gives you:
-
-1. A verdict — `✅ SAFE` / `🟠 SUSPICIOUS` / `🔴 PHISHING`
-2. **A score breakdown**, not a black box:
+Paste a URL, or dump the whole message — WhatsApp forward, SMS, Discord DM, whatever. You get one of three verdicts (`✅ SAFE` / `🟠 SUSPICIOUS` / `🔴 PHISHING`) plus the maths behind it:
 
 ```
 Verdict : 🔴 PHISHING  (score 75/100)
@@ -47,16 +37,13 @@ Verdict : 🔴 PHISHING  (score 75/100)
     +30p  scare/urgency keywords: account, bank, login, otp, update, verify
 ```
 
-No mystery score. Every point has a reason your friend can *understand*.
+No black box. Every point maps to a reason an actual human can read.
 
-And because phishing in 2026 doesn't stop at shady URLs, the scanner also catches the
-sneaky ones — all **offline, zero network calls**:
+Scams in 2026 aren't just dirty URLs anymore though, so the scanner handles those too — and all of this runs offline, zero network calls:
 
-- **Brand spoofing:** `paypal-secure.tk`, `g00gle-login.com` → flagged for using a brand
-  they don't own (with digit + Cyrillic look-alike normalization, `g00gle` → `google`)
-- **Hidden URLs:** base64/hex blobs in a message that decode to `http://evil...`
-- **Email spoofing:** `PayPal Security <secure@paypa1-support.xyz>` → display name and
-  sender domain disagree
+- brands being used by domains that don't own them — `paypal-secure.tk`, `g00gle-login.com` (digits get normalized, `g00gle` → `google`, and Cyrillic look-alikes like `gооgle` get caught too)
+- a base64 or hex blob sitting in the message that decodes to a hidden `http://...`
+- fake sender identities — `PayPal Security <secure@paypa1-support.xyz>`, where the display name and the actual domain disagree
 
 ```
   message:
@@ -64,27 +51,23 @@ sneaky ones — all **offline, zero network calls**:
     +25p  display name says 'PayPal Security' but sender is paypa1-support.xyz
 ```
 
-## The architecture: rules + open-source AI
+## Rules + a local LLM, layered
 
-Pure blocklists miss novel scams. Pure LLMs hallucinate and need your data to leave the
-machine. PhishGuard uses both, layered:
+I didn't want to pick one. Blocklists alone miss brand-new scams. LLMs alone hallucinate, and they want your data sitting on someone else's computer. So it runs both:
 
 ```
  message ──► Link extractor ──► Heuristic engine (deterministic, ~15 signals)
                     │
-                    └──────────► Local LLM second opinion (Ollama + gemma3:2b, 100% offline)
+                    └──────────► Local LLM second opinion (Ollama + gemma3:2b, offline)
                                         │
                                   final verdict (worst of both wins)
 ```
 
-**The AI core is fully open-source and runs on my laptop.** [Ollama](https://ollama.com)
-serves open-weight models like `gemma3:2b` over a local HTTP API — no API key, no telemetry,
-no "your data may be used to improve our services."
+The AI part runs on my laptop through [Ollama](https://ollama.com) using an open-weight model (`gemma3:2b`). No API key, no telemetry, nothing leaves the machine.
 
-The funniest part: the AI and the rules **disagree sometimes**, and that's a feature. When a
-WhatsApp forward *reads* legitimate but contains a shortened URL to a `.top` domain, the rules
-catch what the language model politely overlooks. When the message is pure social engineering
-with no bad keywords, the model catches what regex can't.
+Best part — they disagree sometimes, and that's useful. A forward that reads fine but hides a `.top` shortener: rules catch it. A message with zero suspicious keywords that just *feels* wrong ("your SIM will be deactivated, call 198 now"): rules give it 0/100, the model straight up says PHISHING. That exact example is in "Try it yourself" below, try it yourself.
+
+The AI call, the whole thing, is honestly just this:
 
 ```python
 def ask_ollama(text):
@@ -94,29 +77,23 @@ def ask_ollama(text):
         return json.loads(resp.read().decode())["response"]
 ```
 
-If Ollama isn't running, PhishGuard says so and falls back to heuristics — it never
-pretends to be smarter than it is.
+If Ollama isn't running, it tells you and falls back to the rules. No pretending to be smarter than it is.
 
-## Why open innovation matters here
+## Why open innovation matters (the prompt asked, so here's my honest answer)
 
-This tool's whole promise is *"your data never leaves your machine."* That promise is only
-possible because the AI underneath is **open and local**: an open-weight model (Gemma) served
-by an open-source runtime (Ollama) inside a zero-dependency script. Swap the closed version of
-this — paste the suspicious link into a hosted "AI scam checker" — and you've just handed a
-stranger the exact thing you were suspicious about, plus your query history.
+The whole product promise is *"your data never leaves your machine."* That promise only exists because the model underneath is open and local. Swap it for a closed API — even a good one — and PhishGuard becomes the exact thing I was warning my friend about: paste your suspicious thing here and trust us.
 
-Open also means **auditable**: anyone can read the 15 scoring rules, disagree with one, and
-send a PR. Try that with a proprietary fraud score. And it means my friend can run it on a
-laptop with the Wi-Fi off — which, for a security tool, is the point.
+Open also means readable. Those ~15 scoring rules live in one Python file. Someone can disagree with rule #7 tonight and send a PR tomorrow. Try doing that with a fraud score buried inside a banking app.
+
+And practically — my friend runs it with the Wi-Fi off. For a security tool, that kind of matters.
 
 ## Try it yourself
 
-**No install** (heuristic engine, hosted on Render):
+No install needed (heuristic engine, hosted on Render):
 
 👉 https://phishguard-oi4y.onrender.com
 
-**With the local AI** (one command, 30 seconds — the part the hosted demo deliberately
-doesn't do, because your suspicious link should not travel to someone else's server):
+With the AI — about 30 seconds of setup. This is the part the hosted demo deliberately skips, because your suspicious link shouldn't be travelling anywhere:
 
 ```bash
 git clone https://github.com/shri7-lab/phishguard.git && cd phishguard
@@ -131,62 +108,50 @@ note    : no link/payload found — local AI weighed in on the text
   are not genuine, potentially suspicious activity.
 ```
 
-Rules scored that message **0/100 (SAFE)** — the open-weight model caught it. That's the
-whole architecture in one example.
+The rules scored that message 0/100 — SAFE. The open-weight model caught it. That one example is basically the entire architecture.
 
-**Tests:** `python3 -m unittest discover -s tests` → `Ran 12 tests ... OK`
+Tests are there too: `python3 -m unittest discover -s tests` → `Ran 12 tests ... OK`. Yeah, unit tests in a weekend project — I changed a score value at 1 AM, broke two verdicts without noticing, and then the suite earned its place permanently.
 
-## Zero dependencies, on purpose
+## Zero dependencies (this was non-negotiable)
 
-`phishguard.py` is **one file, Python standard library only.** No `pip install`, no virtualenv
-drama, no `node_modules` of doom. My friend — the same one who almost clicked — ran it with:
+`phishguard.py` is one file, Python standard library only. No pip install, no virtualenv drama, no node_modules. My friend — the same guy who almost clicked the link — ran exactly this much:
 
 ```bash
 git clone https://github.com/shri7-lab/phishguard.git
 python3 phishguard.py check "bit.ly/fee-refund-2026"
 ```
 
-There's also a browser mode for people who won't open a terminal:
+There's a browser mode as well, for people who won't open a terminal:
 
 ```bash
-python3 phishguard.py web   # dark-themed UI on localhost:8080
+python3 phishguard.py web   # localhost:8080
 ```
 
 ![PhishGuard browser demo — paste link, get an explained verdict](https://raw.githubusercontent.com/shri7-lab/phishguard/main/assets/web-result.png)
 
-I handed him PhishGuard that Sunday over a quick screen-share. He pasted the same
-`bit.ly/fee-refund-2026` forward back into it and got `🟠 SUSPICIOUS — link shortener
-hides the real destination`. His words: *"Bhai, ab click karne se pehle yahi check
-karunga — screenshot wali baat samajh aa gayi."* That one line made the weekend worth it.
+I handed it over to him on Sunday over a screen-share. He pasted that same `bit.ly/fee-refund-2026` forward into it, got `🟠 SUSPICIOUS — link shortener hides the real destination`, and said:
 
-## The build, honestly
+> "Bhai, ab click karne se pehle yahi check karunga — screenshot wali baat samajh aa gayi."
 
-- **Saturday morning:** link extractor + heuristic scoring (the 15 signals table in the README)
-- **Saturday night:** Ollama integration + graceful degradation
-- **Sunday:** web UI, README, and this article — plus testing on every scam link I could find
-  in my WhatsApp archive (yes, I have a folder. yes, it's depressing.)
+That one line made the whole weekend worth it.
 
-What surprised me: **most phishing detection advice online is "look for the lock icon and check
-the spelling."** My friends don't do that at 11 PM. They need a *second pair of eyes that
-answers in 2 seconds* — not a lecture.
+## How the weekend actually went
 
-Everything above runs on **12 stdlib `unittest` tests** (`python3 -m unittest discover -s tests`)
-— scoring thresholds, homoglyph spoofs, hidden blobs, email fakes. When I changed a score
-value at 1 AM, the suite caught the regression before I did. For a "one file, no dependencies"
-tool, tests felt like the grown-up thing to have.
+Saturday morning: link extractor plus the scoring rules (full table is in the README). Saturday night turned into the Ollama integration — making the JSON reply behave took longer than the scoring engine did, I'm not joking. Sunday was the web UI, the README and this post, and testing on every scam message sitting in my WhatsApp archive (yes, I have a folder for them, yes, it's depressing).
 
-## What's next (steal these ideas if you want)
+What surprised me: almost all the advice online is "check the lock icon, check the spelling." Nobody does that at 11 PM. People just need a second pair of eyes that answers in 2 seconds.
 
-- Homoglyph detection (visual similarity to real brands)
-- QR-code scam poster decoding
-- Indian UPI/vishing number patterns
-- A `pre-commit` hook so you can't even commit your own credentials by accident
+## Things I'm leaving on the table (steal these)
+
+- QR-code decoding for those "scan to pay" scam posters
+- Indian UPI / vishing number patterns — we get these daily
+- A browser extension wrapper
+- A pre-commit hook so you can't push your own API keys by accident
 
 ---
 
-I'm a first-year CSE student who spends nights on Hack The Box instead of Instagram.
-If PhishGuard saves one friend from a "fee refund" scam, it beat every star count on GitHub.
+I'm 18, first year CSE, and I spend nights on Hack The Box instead of Instagram. If PhishGuard saves even one person from a "fee refund" scam, that beats any star count on GitHub.
 
-**Try it, break it, send a PR. Happy Hacktoberfest! 🎃**
+Try it, break it, send a PR. Happy Hacktoberfest 🎃
 
 `#hf26challenge` `#weekendchallenge` `#ai`
