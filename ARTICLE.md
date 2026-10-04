@@ -3,7 +3,7 @@
 > 🏷️ Tags: `hf26challenge` `devchallenge` `weekendchallenge` `security` `ai` `opensource` `python`
 > 📅 DEV Weekend Challenge: **Build for a Friend** · Hacktoberfest 2026
 > 🔗 Repo: https://github.com/shri7-lab/phishguard
-> 🌐 **Live demo:** https://phishguard.onrender.com
+> 🌐 **Live demo:** https://phishguard-oi4y.onrender.com
 
 ## Prize Categories
 
