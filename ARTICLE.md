@@ -109,6 +109,33 @@ Open also means **auditable**: anyone can read the 15 scoring rules, disagree wi
 send a PR. Try that with a proprietary fraud score. And it means my friend can run it on a
 laptop with the Wi-Fi off — which, for a security tool, is the point.
 
+## Try it yourself
+
+**No install** (heuristic engine, hosted on Render):
+
+👉 https://phishguard-oi4y.onrender.com
+
+**With the local AI** (one command, 30 seconds — the part the hosted demo deliberately
+doesn't do, because your suspicious link should not travel to someone else's server):
+
+```bash
+git clone https://github.com/shri7-lab/phishguard.git && cd phishguard
+brew install ollama && ollama pull gemma3:2b    # Linux: curl -fsSL https://ollama.com/install.sh | sh
+python3 phishguard.py check "Your SIM will be deactivated today. Call 198 to re-validate"
+```
+
+```
+Verdict : 🔴 PHISHING  (score 0/100)
+note    : no link/payload found — local AI weighed in on the text
+  AI: PHISHING — SIM deactivation threat and urgency to call a number
+  are not genuine, potentially suspicious activity.
+```
+
+Rules scored that message **0/100 (SAFE)** — the open-weight model caught it. That's the
+whole architecture in one example.
+
+**Tests:** `python3 -m unittest discover -s tests` → `Ran 11 tests ... OK`
+
 ## Zero dependencies, on purpose
 
 `phishguard.py` is **one file, Python standard library only.** No `pip install`, no virtualenv

@@ -480,7 +480,11 @@ def render_html(result):
         if result.get("ai"):
             ai_html = f'<div class="ai">🤖 Local AI ({result["ai"]["model"]}): {result["ai"]["verdict"]} &mdash; {result["ai"]["reason"]}</div>'
         elif result.get("ai_error"):
-            ai_html = f'<div class="hint">ℹ️ {result["ai_error"]}</div>'
+            ai_html = (
+                f'<div class="hint">ℹ️ {result["ai_error"]} &middot; '
+                '<a href="https://github.com/shri7-lab/phishguard#-optional-add-local-ai">'
+                "enable the AI in one command &rarr;</a></div>"
+            )
         if result.get("note"):
             note = f'<div class="hint">{result["note"]}</div>'
     return f"""<!doctype html>
