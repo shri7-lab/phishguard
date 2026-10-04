@@ -90,7 +90,7 @@ with no bad keywords, the model catches what regex can't.
 def ask_ollama(text):
     body = json.dumps({"model": "gemma3:2b", "prompt": prompt, "stream": False}).encode()
     req = urllib.request.Request(OLLAMA + "/api/generate", data=body, ...)
-    with urllib.request.urlopen(req, timeout=12) as resp:
+    with urllib.request.urlopen(req, timeout=45) as resp:
         return json.loads(resp.read().decode())["response"]
 ```
 
@@ -134,7 +134,7 @@ note    : no link/payload found — local AI weighed in on the text
 Rules scored that message **0/100 (SAFE)** — the open-weight model caught it. That's the
 whole architecture in one example.
 
-**Tests:** `python3 -m unittest discover -s tests` → `Ran 11 tests ... OK`
+**Tests:** `python3 -m unittest discover -s tests` → `Ran 12 tests ... OK`
 
 ## Zero dependencies, on purpose
 
@@ -154,6 +154,11 @@ python3 phishguard.py web   # dark-themed UI on localhost:8080
 
 ![PhishGuard browser demo — paste link, get an explained verdict](https://raw.githubusercontent.com/shri7-lab/phishguard/main/assets/web-result.png)
 
+I handed him PhishGuard that Sunday over a quick screen-share. He pasted the same
+`bit.ly/fee-refund-2026` forward back into it and got `🟠 SUSPICIOUS — link shortener
+hides the real destination`. His words: *"Bhai, ab click karne se pehle yahi check
+karunga — screenshot wali baat samajh aa gayi."* That one line made the weekend worth it.
+
 ## The build, honestly
 
 - **Saturday morning:** link extractor + heuristic scoring (the 15 signals table in the README)
@@ -165,7 +170,7 @@ What surprised me: **most phishing detection advice online is "look for the lock
 the spelling."** My friends don't do that at 11 PM. They need a *second pair of eyes that
 answers in 2 seconds* — not a lecture.
 
-Everything above runs on **11 stdlib `unittest` tests** (`python3 -m unittest discover -s tests`)
+Everything above runs on **12 stdlib `unittest` tests** (`python3 -m unittest discover -s tests`)
 — scoring thresholds, homoglyph spoofs, hidden blobs, email fakes. When I changed a score
 value at 1 AM, the suite caught the regression before I did. For a "one file, no dependencies"
 tool, tests felt like the grown-up thing to have.
@@ -184,16 +189,4 @@ If PhishGuard saves one friend from a "fee refund" scam, it beat every star coun
 
 **Try it, break it, send a PR. Happy Hacktoberfest! 🎃**
 
-`#hf26challenge` `#weekendchallenge` `#ai` `#opensource` `#security`
-
----
-
-### 📝 Publishing checklist (edit before submitting on DEV)
-
-- [ ] Replace "My friend" details if you want the real first name
-- [x] Screenshots inserted (terminal + web demo, auto-hosted from repo)
-- [ ] Optional GIF: record paste → verdict (free tools: **Kap** on Mac, **ScreenToGif** on Windows, `asciinema` + `agg` on Linux)
-- [ ] Cover image: use `assets/terminal.png`
-- [ ] On DEV: paste article, add tags `hf26challenge` `devchallenge` `weekendchallenge` (+ `security`, `ai`, `opensource`)
-- [ ] Link the repo in the first 3 lines
-- [ ] Submit at the challenge page before the deadline
+`#hf26challenge` `#weekendchallenge` `#ai`
