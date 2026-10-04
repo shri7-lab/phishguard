@@ -1,5 +1,9 @@
 # 🛡️ PhishGuard
 
+[![tests](https://github.com/shri7-lab/phishguard/actions/workflows/tests.yml/badge.svg)](https://github.com/shri7-lab/phishguard/actions/workflows/tests.yml)
+[![python](https://img.shields.io/badge/python-3.8%2B-blue)](https://python.org)
+[![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 **Local-first phishing & scam link checker — built for a friend, in a Hacktoberfest weekend.**
 
 ![PhishGuard terminal verdict](assets/terminal.png)

@@ -1,0 +1,22 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run test suite
+        run: python3 -m unittest discover -s tests -v
+      - name: CLI smoke test
+        run: |
+          set +e
+          python3 phishguard.py check --no-ai --no-color "http://192.168.0.1/bank-login"
+          rc=$?
+          if [ "$rc" -gt 1 ]; then exit "$rc"; fi

@@ -70,6 +70,12 @@ class MessageScanTests(unittest.TestCase):
         for key in ("input", "verdict", "score", "links", "message_findings", "ai", "note"):
             self.assertIn(key, result)
 
+    def test_web_render_escapes_hostile_payloads(self):
+        hidden = base64.b64encode(b"<img src=x onerror=alert(1)> http://x").decode()
+        rendered = pg.render_html(pg.analyze("check " + hidden))
+        self.assertNotIn("<img src=x onerror", rendered)
+        self.assertIn("&lt;img", rendered)
+
 
 if __name__ == "__main__":
     unittest.main()

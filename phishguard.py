@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import html
 import json
 import os
 import re
@@ -464,29 +465,49 @@ def render_html(result):
     note = ""
     if result:
         for link in result["links"]:
-            items.append(f'<p style="color:#58a6ff;word-break:break-all">{link["url"]}</p><ul>')
+            items.append(
+                '<p style="color:#58a6ff;word-break:break-all">'
+                + html.escape(link["url"])
+                + "</p><ul>"
+            )
             if not link["findings"]:
                 items.append("<li>no suspicious signals</li>")
             for f in link["findings"]:
                 color = "#ff7b72" if f["points"] > 0 else "#56d364"
                 sign = "+" if f["points"] > 0 else ""
-                items.append(f'<li style="color:{color}">{sign}{f["points"]}p &mdash; {f["detail"]}</li>')
+                items.append(
+                    f'<li style="color:{color}">{sign}{f["points"]}p &mdash; '
+                    + html.escape(f["detail"])
+                    + "</li>"
+                )
             items.append("</ul>")
         if result.get("message_findings"):
             items.append('<p style="color:#58a6ff">message signals</p><ul>')
             for f in result["message_findings"]:
-                items.append(f'<li style="color:#ff7b72">+{f["points"]}p &mdash; {f["detail"]}</li>')
+                items.append(
+                    f'<li style="color:#ff7b72">+{f["points"]}p &mdash; '
+                    + html.escape(f["detail"])
+                    + "</li>"
+                )
             items.append("</ul>")
         if result.get("ai"):
-            ai_html = f'<div class="ai">🤖 Local AI ({result["ai"]["model"]}): {result["ai"]["verdict"]} &mdash; {result["ai"]["reason"]}</div>'
+            ai_html = (
+                '<div class="ai">🤖 Local AI ('
+                + html.escape(result["ai"]["model"])
+                + "): "
+                + html.escape(result["ai"]["verdict"])
+                + " &mdash; "
+                + html.escape(result["ai"]["reason"])
+                + "</div>"
+            )
         elif result.get("ai_error"):
             ai_html = (
-                f'<div class="hint">ℹ️ {result["ai_error"]} &middot; '
+                f'<div class="hint">ℹ️ {html.escape(result["ai_error"])} &middot; '
                 '<a href="https://github.com/shri7-lab/phishguard#-optional-add-local-ai">'
                 "enable the AI in one command &rarr;</a></div>"
             )
         if result.get("note"):
-            note = f'<div class="hint">{result["note"]}</div>'
+            note = '<div class="hint">' + html.escape(result["note"]) + "</div>"
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
